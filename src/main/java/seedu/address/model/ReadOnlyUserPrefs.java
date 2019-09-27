@@ -13,9 +13,4 @@ public interface ReadOnlyUserPrefs {
 
     Path getCatalogFilePath();
 
-    Path getLoanRecordsFilePath();
-
-    Path getCatalogFilePath();
-
-    Path getBorrowerRecordsFilePath();
 }

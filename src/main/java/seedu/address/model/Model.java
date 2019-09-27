@@ -45,56 +45,43 @@ public interface Model {
     void setCatalogFilePath(Path addressBookFilePath);
 
     /**
-     * Returns the user prefs' loan records file path.
+     * Replaces address book data with the data in {@code addressBook}.
      */
     void setCatalog(ReadOnlyCatalog addressBook);
 
-    Path getLoanRecordsFilePath();
-
-    void setLoanRecordsFilePath(Path loanRecordsFilePath);
-
-    public Path getCatalogFilePath();
-  
-    /**
-     * Returns the user prefs' catalog file path.
-     */
-    public void setCatalogFilePath(Path catalogFilePath);
+    /** Returns the AddressBook */
+    ReadOnlyCatalog getCatalog();
 
     /**
-     * Sets the user prefs' loan records file path.
+     * Returns true if a person with the same identity as {@code person} exists in the address book.
      */
     boolean hasBook(Book book);
+
     /**
-     * Returns the user prefs' catalog file path.
+     * Deletes the given person.
+     * The person must exist in the address book.
      */
     void deleteBook(Book target);
-  
+
+    /**
+     * Adds the given person.
+     * {@code person} must not already exist in the address book.
+     */
     void addBook(Book book);
-  
+
+    /**
+     * Replaces the given person {@code target} with {@code editedPerson}.
+     * {@code target} must exist in the address book.
+     * The person identity of {@code editedPerson} must not be the same as another existing person in the address book.
+     */
     void setBook(Book target, Book editedBook);
 
     /** Returns an unmodifiable view of the filtered person list */
     ObservableList<Book> getFilteredBookList();
-  
+
+    /**
+     * Updates the filter of the filtered person list to filter by the given {@code predicate}.
+     * @throws NullPointerException if {@code predicate} is null.
+     */
     void updateFilteredBookList(Predicate<Book> predicate);
-  
-    /**
-     * Returns the user prefs' borrower records file path.
-     */
-    Path getBorrowerRecordsFilePath();
-  
-    /**
-     * Sets the user prefs' address borrower records path.
-     */
-    void setBorrowerRecordsFilePath(Path borrowerRecordsFilePath);
-
-
-    /** Returns the LoanRecords*/
-    ReadOnlyLoanRecords getLoanRecords();
-
-    /** Returns the Catalog*/
-    ReadOnlyCatalog getCatalog();
-
-    /** Returns the BorrowerRecords*/
-    ReadOnlyBorrowerRecords getBorrowerRecords();
 }
