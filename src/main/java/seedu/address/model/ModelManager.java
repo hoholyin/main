@@ -19,39 +19,27 @@ import seedu.address.model.book.Book;
 public class ModelManager implements Model {
     private static final Logger logger = LogsCenter.getLogger(ModelManager.class);
 
-    private final UserPrefs userPrefs;
-    private final LoanRecords loanRecords;
     private final Catalog catalog;
-    private final BorrowerRecords borrowerRecords;
+    private final UserPrefs userPrefs;
+    private final FilteredList<Book> filteredBooks;
 
     /**
-     * Initializes a ModelManager with the given addressBook and userPrefs.
-     * TODO change
+     * Initializes a ModelManager with the given catalog and userPrefs.
      */
-    public ModelManager(ReadOnlyUserPrefs userPrefs,
-                        ReadOnlyLoanRecords loanRecords, ReadOnlyCatalog catalog,
-                        ReadOnlyBorrowerRecords borrowerRecords) 
+    public ModelManager(ReadOnlyCatalog catalog, ReadOnlyUserPrefs userPrefs) {
         super();
-//        requireAllNonNull(addressBook, userPrefs, catalog);
+        requireAllNonNull(catalog, userPrefs);
 
         logger.fine("Initializing with catalog: " + catalog + " and user prefs " + userPrefs);
 
-        this.userPrefs = new UserPrefs(userPrefs);
-        // testing loan records
-        this.loanRecords = new LoanRecords(loanRecords);
-        this.loanRecords.populateLoans();
-        // testing
         this.catalog = new Catalog(catalog);
-        this.catalog.populateBooks();
-        // testing
-        this.borrowerRecords = new BorrowerRecords(borrowerRecords);
-        this.borrowerRecords.populateBorrowers();
+        this.userPrefs = new UserPrefs(userPrefs);
         SerialNumberGenerator.setCatalog((Catalog) catalog);
+        filteredBooks = new FilteredList<>(this.catalog.getBookList());
     }
 
     public ModelManager() {
-        this(new UserPrefs(),
-                new LoanRecords(), new Catalog(), new BorrowerRecords());
+        this(new Catalog(), new UserPrefs());
     }
 
     //=========== UserPrefs ==================================================================================
@@ -89,7 +77,6 @@ public class ModelManager implements Model {
         userPrefs.setCatalogFilePath(addressBookFilePath);
     }
 
-
     //=========== Catalog ================================================================================
 
     @Override
@@ -125,47 +112,8 @@ public class ModelManager implements Model {
 
         catalog.setBook(target, editedBook);
     }
-    
-    public Path getLoanRecordsFilePath() {
-        return userPrefs.getLoanRecordsFilePath();
-    }
 
-    @Override
-    public void setLoanRecordsFilePath(Path loanRecordsFilePath) {
-        requireNonNull(loanRecordsFilePath);
-        userPrefs.setLoanRecordsFilePath(loanRecordsFilePath);
-    }
-
-    @Override
-    public Path getCatalogFilePath() {
-        return userPrefs.getCatalogFilePath();
-    }
-
-    @Override
-    public void setCatalogFilePath(Path catalogFilePath) {
-        requireNonNull(catalogFilePath);
-        userPrefs.setCatalogFilePath(catalogFilePath);
-    }
-
-    @Override
-    public Path getBorrowerRecordsFilePath() {
-        return userPrefs.getBorrowerRecordsFilePath();
-    }
-
-    @Override
-    public void setBorrowerRecordsFilePath(Path borrowerRecordsFilePath) {
-        requireNonNull(borrowerRecordsFilePath);
-        userPrefs.setBorrowerRecordsFilePath(borrowerRecordsFilePath);
-    }
-
-    //=========== Loan Records ===============================================================================
-
-    public ReadOnlyLoanRecords getLoanRecords() {
-        return loanRecords;
-    }
-
-    //=========== Catalog ===============================================================================
-
+    //=========== Filtered Person List Accessors =============================================================
 
     /**
      * Returns an unmodifiable view of the list of {@code Person} backed by the internal list of
@@ -182,13 +130,6 @@ public class ModelManager implements Model {
         filteredBooks.setPredicate(predicate);
     }
 
-    //=========== BorrowerRecords ===============================================================================
-
-    public ReadOnlyBorrowerRecords getBorrowerRecords() {
-        return borrowerRecords;
-    }
-
-
     @Override
     public boolean equals(Object obj) {
         // short circuit if same object
@@ -203,10 +144,9 @@ public class ModelManager implements Model {
 
         // state check
         ModelManager other = (ModelManager) obj;
-        return userPrefs.equals(other.userPrefs)
-                && loanRecords.equals(other.loanRecords)
-                && catalog.equals(other.catalog)
-                && borrowerRecords.equals(other.borrowerRecords);
+        return catalog.equals(other.catalog)
+                && userPrefs.equals(other.userPrefs)
+                && filteredBooks.equals(other.filteredBooks);
     }
 
 }
